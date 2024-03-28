@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(cors());
 
 app.get("/", (_req, res) => {
-  res.json({ message: "Ich bin ein lustiger text aus dem Backend" });
+  res.json({ message: "If you can read this the backend is running" });
 });
 
 app.get("/data", (_req, res) => {
