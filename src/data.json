@@ -1,0 +1,97 @@
+{
+  "company": {
+    "name": "Tech Innovations Inc.",
+    "address": {
+      "street": "123 Main St",
+      "city": "Tech City",
+      "state": "Techsylvania",
+      "zip": "12345"
+    },
+    "departments": [
+      {
+        "name": "Engineering",
+        "employees": [
+          {
+            "id": 1,
+            "name": "John Doe",
+            "position": "Software Engineer",
+            "skills": ["Java", "Python", "JavaScript"],
+            "projects": ["Project A", "Project B"]
+          },
+          {
+            "id": 2,
+            "name": "Jane Smith",
+            "position": "Data Scientist",
+            "skills": ["R", "Python", "SQL"],
+            "projects": ["Project C", "Project D"]
+          }
+        ]
+      },
+      {
+        "name": "Sales",
+        "employees": [
+          {
+            "id": 3,
+            "name": "Michael Johnson",
+            "position": "Sales Manager",
+            "territory": "North America",
+            "clients": ["Client X", "Client Y"]
+          },
+          {
+            "id": 4,
+            "name": "Emily Brown",
+            "position": "Sales Representative",
+            "territory": "Europe",
+            "clients": ["Client Z", "Client W"]
+          }
+        ]
+      }
+    ]
+  },
+  "products": [
+    {
+      "id": 101,
+      "name": "Laptop",
+      "category": "Electronics",
+      "price": 1200,
+      "quantity": 50
+    },
+    {
+      "id": 102,
+      "name": "Smartphone",
+      "category": "Electronics",
+      "price": 800,
+      "quantity": 100
+    }
+  ],
+  "customers": [
+    {
+      "id": 1001,
+      "name": "Alice Johnson",
+      "email": "alice@example.com",
+      "phone": "+1234567890",
+      "orders": [
+        {
+          "order_id": "ORD001",
+          "products": [{ "id": 101, "quantity": 2 }]
+        },
+        {
+          "order_id": "ORD002",
+          "products": [{ "id": 102, "quantity": 1 }]
+        }
+      ]
+    },
+    {
+      "id": 1002,
+      "name": "Bob Smith",
+      "email": "bob@example.com",
+      "phone": "+1987654321",
+      "orders": [
+        {
+          "order_id": "ORD003",
+          "products": [{ "id": 101, "quantity": 1 }]
+        }
+      ]
+    }
+  ]
+}
