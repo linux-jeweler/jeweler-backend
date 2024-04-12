@@ -1,12 +1,18 @@
-import express, { response } from "express";
+import express from "express";
+import axios from "axios";
 import "./data-source";
 import cors from "cors";
 import fs from "fs";
 
 const port = process.env.PORT || 3001;
 const app = express();
+const router = express.Router();
+const aurRoutes = require("./curator/sources/arch_aur");
+
 app.use(express.json());
 app.use(cors());
+
+router.use("/aur", aurRoutes);
 
 app.get("/", (_req, res) => {
   res.json({ message: "If you can read this the backend is running" });
@@ -23,6 +29,19 @@ app.get("/data", (_req, res) => {
   }
 });
 
+/*
+
+PACKAGE SEARCH ENDPOINT
+
+takes input from search query
+returns a list of packages that match the search query from unified package database
+
+query database with search string
+
+
+
+*/
+
 app.get("/aur/info/:name", async (req, res) => {
   try {
     const rawData = await fetch(
@@ -38,3 +57,5 @@ app.get("/aur/info/:name", async (req, res) => {
 app.listen(port, () => {
   console.log(`App running on Port ${port}`);
 });
+
+module.exports = router;
