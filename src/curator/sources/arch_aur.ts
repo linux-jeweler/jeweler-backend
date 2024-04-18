@@ -1,22 +1,18 @@
-import express from "express";
-import axios from "axios";
-import "./data-source";
-import cors from "cors";
+import express from 'express';
+import axios from 'axios';
+import './data-source';
+import cors from 'cors';
 
-const app = express();
-const router = express.Router();
-app.use(cors());
-
-app.get("/aur/info/:name", async (req, res) => {
+export async function getAurInfo(name: string) {
+  //takes package name as input and returns package info from AUR
   try {
-    const rawData = await fetch(
-      process.env.ARCH_AUR + "/info/" + req.params.name
-    );
-    res.send(await rawData.json());
-    return;
+    const response = await axios.get(process.env.ARCH_AUR + '/info/' + name);
+    return response.data;
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error('Error fetching data:', error);
   }
-});
+}
 
-module.exports = router;
+async function performAurSearch(query: string) {
+  //takes search query as input and returns list of packages from AUR
+}

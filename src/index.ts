@@ -1,31 +1,32 @@
-import express from "express";
-import axios from "axios";
-import "./data-source";
-import cors from "cors";
-import fs from "fs";
+import express from 'express';
+import axios from 'axios';
+import './data-source';
+import cors from 'cors';
+import { getAurInfo } from './curator/sources/arch_aur';
 
 const port = process.env.PORT || 3001;
 const app = express();
 const router = express.Router();
-const aurRoutes = require("./curator/sources/arch_aur");
+const aurRoutes = require('./curator/sources/arch_aur');
 
 app.use(express.json());
 app.use(cors());
+app.use(router);
 
-router.use("/aur", aurRoutes);
+router.use('/aur', aurRoutes);
 
-app.get("/", (_req, res) => {
-  res.json({ message: "If you can read this the backend is running" });
+app.get('/', (_req, res) => {
+  res.json({ message: 'If you can read this the backend is running' });
 });
 
-app.get("/data", (_req, res) => {
+app.get('/aur/info/:name', async (req, res) => {
   try {
-    const rawData = fs.readFileSync("src/data.json");
-    const data = JSON.parse(rawData.toString());
-    console.log(rawData);
-    res.json(data);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    // const rawData = await axios.get(
+    //   process.env.ARCH_AUR + '/info/' + req.params.name
+    // );
+    return;
+  } catch (error) {
+    console.error('Error fetching data:', error);
   }
 });
 
@@ -35,24 +36,13 @@ PACKAGE SEARCH ENDPOINT
 
 takes input from search query
 returns a list of packages that match the search query from unified package database
+if there are no matching packages perform search query on source APIs
 
 query database with search string
 
 
 
 */
-
-app.get("/aur/info/:name", async (req, res) => {
-  try {
-    const rawData = await fetch(
-      process.env.ARCH_AUR + "/info/" + req.params.name
-    );
-    res.send(await rawData.json());
-    return;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-});
 
 app.listen(port, () => {
   console.log(`App running on Port ${port}`);
