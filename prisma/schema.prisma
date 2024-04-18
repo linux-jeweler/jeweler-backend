@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model PackageSource {
+  id                     Int      @id @default(autoincrement())
+  name                   String
+  image                  String?
+  info                   String?
+  description            String?
+  trustedStatus          Boolean
+
+  software               SoftwareSource[]
+  distribution           LinuxDistro[]
+}
+
+model Software {
+  id            Int      @id @default(autoincrement())
+  name          String
+  version       String
+  dependencies  String?
+  description   String?
+  lastModified  DateTime
+  license       String?
+  url           String?
+
+  softwareSources SoftwareSource[]
+}
+
+model LinuxDistro {
+  id             Int    @id @default(autoincrement())
+  name           String
+  version        String
+
+  packageSource PackageSource[]
+  softwareSource SoftwareSource[]
+}
+
+model SoftwareSource {
+  software Software @relation(fields: [softwareId], references: [id])
+  softwareId Int
+  packageSource PackageSource @relation(fields: [pkgSourceId], references: [id])
+  pkgSourceId Int
+  installCommand String?
+  instructions String?
+  version String?
+  altInstallOption String?
+  supportedDistro LinuxDistro @relation(fields: [distroId], references: [id])
+  distroId Int
+  @@id([softwareId, pkgSourceId])
+}
