@@ -7,20 +7,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model PackageSource {
-  id                     Int      @id @default(autoincrement())
-  name                   String
-  image                  String?
-  info                   String?
-  description            String?
-  trustedStatus          Boolean
+model LinuxDistro {
+  id            String              @id @default(uuid())
+  name          String
+  version       String
 
-  software               SoftwareSource[]
-  distribution           LinuxDistro[]
+  packageSources PackageSource[]
+  softwareOnSources SoftwareOnSource[]
+}
+
+model PackageSource {
+  id            String              @id @default(uuid())
+  name          String
+  image         String?
+  info          String?
+  description   String?
+  trustedStatus Boolean
+
+  distros           LinuxDistro[]
+  software          Software[]
+  softwareOnSources SoftwareOnSource[]
 }
 
 model Software {
-  id            Int      @id @default(autoincrement())
+  id            String              @id @default(uuid())
   name          String
   version       String
   dependencies  String?
@@ -29,28 +39,22 @@ model Software {
   license       String?
   url           String?
 
-  softwareSources SoftwareSource[]
+  packageSources PackageSource[]
+  softwareOnSources SoftwareOnSource[]
 }
 
-model LinuxDistro {
-  id             Int    @id @default(autoincrement())
-  name           String
-  version        String
+model SoftwareOnSource {
+  software      Software         @relation(fields: [softwareId], references: [id])
+  softwareId    String
+  source        PackageSource    @relation(fields: [sourceId], references: [id])
+  sourceId      String
+  distro        LinuxDistro      @relation(fields: [distroId], references: [id])
+  distroId      String
 
-  packageSource PackageSource[]
-  softwareSource SoftwareSource[]
-}
-
-model SoftwareSource {
-  software Software @relation(fields: [softwareId], references: [id])
-  softwareId Int
-  packageSource PackageSource @relation(fields: [pkgSourceId], references: [id])
-  pkgSourceId Int
   installCommand String?
-  instructions String?
-  version String?
-  altInstallOption String?
-  supportedDistro LinuxDistro @relation(fields: [distroId], references: [id])
-  distroId Int
-  @@id([softwareId, pkgSourceId])
+  instructions  String?
+  downloadLink  String?
+
+  @@id([softwareId, sourceId, distroId])
 }
+
