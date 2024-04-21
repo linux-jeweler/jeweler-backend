@@ -14,6 +14,12 @@ export function convertFromAurToDatabaseFormat(rawData: any) {
     lastModified: lastModified,
     license: rawData.License,
     url: rawData.URL,
+
+    // instructions:
+    //   'Copy the command below and paste it into your terminal to install' +
+    //   rawData.Name,
+    // installCommand: 'yay -S ' + rawData.Name,
+    // downloadUrl: 'https://aur.archlinux.org/packages/' + rawData.Name,
   };
 
   return formattedData;

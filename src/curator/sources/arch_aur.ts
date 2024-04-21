@@ -1,7 +1,5 @@
-import express from 'express';
 import axios from 'axios';
 import '../../data-source';
-import cors from 'cors';
 
 export async function getAurInfo(name: string) {
   //takes package name as input and returns package info from AUR

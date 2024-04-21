@@ -1,5 +1,4 @@
 import express from 'express';
-import axios from 'axios';
 import './data-source';
 import cors from 'cors';
 import { getAurInfo } from './curator/sources/arch_aur';
@@ -9,7 +8,6 @@ import { convertFromAurToDatabaseFormat } from './middleware/DatabaseFormatter';
 const port = process.env.PORT || 3001;
 const app = express();
 const router = express.Router();
-const aurRoutes = require('./curator/sources/arch_aur');
 
 app.use(express.json());
 app.use(cors());
