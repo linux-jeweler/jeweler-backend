@@ -24,10 +24,10 @@ CREATE TABLE "Software" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "version" TEXT NOT NULL,
-    "dependencies" TEXT,
+    "dependencies" TEXT[],
     "description" TEXT,
-    "lastModified" TIMESTAMP(3) NOT NULL,
-    "license" TEXT,
+    "lastModified" TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "license" TEXT[],
     "url" TEXT,
 
     CONSTRAINT "Software_pkey" PRIMARY KEY ("id")

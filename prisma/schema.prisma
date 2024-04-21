@@ -33,10 +33,10 @@ model Software {
   id            String              @id @default(uuid())
   name          String
   version       String
-  dependencies  String?
+  dependencies  String[]
   description   String?
-  lastModified  DateTime
-  license       String?
+  lastModified  DateTime            @default(now()) @db.Timestamp(0)
+  license       String[]
   url           String?
 
   packageSources PackageSource[]
