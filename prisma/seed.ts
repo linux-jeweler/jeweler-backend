@@ -22,9 +22,35 @@ async function seedSoftware() {
       { name: 'fedora', version: 'F39' },
     ];
 
-    await prisma.software.createMany({ data: softwareData });
-    await prisma.packageSource.createMany({ data: packageSourceData });
-    await prisma.linuxDistro.createMany({ data: distroData });
+    for (const software of softwareData) {
+      const softwareExists = await prisma.software.findFirst({
+        where: { name: software.name, version: software.version },
+      });
+
+      if (!softwareExists) {
+        await prisma.software.create({ data: software });
+      }
+    }
+
+    for (const source of packageSourceData) {
+      const sourceExists = await prisma.packageSource.findFirst({
+        where: { name: source.name },
+      });
+
+      if (!sourceExists) {
+        await prisma.packageSource.create({ data: source });
+      }
+    }
+
+    for (const distro of distroData) {
+      const distroExists = await prisma.linuxDistro.findFirst({
+        where: { name: distro.name, version: distro.version },
+      });
+
+      if (!distroExists) {
+        await prisma.linuxDistro.create({ data: distro });
+      }
+    }
 
     console.log('Software seeding completed.');
   } catch (error) {

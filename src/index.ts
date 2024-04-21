@@ -19,6 +19,7 @@ app.get('/', (_req, res) => {
   res.json({ message: 'If you can read this the backend is running' });
 });
 
+//AUR info endpoint
 app.get('/aur/info/:name', async (req, res) => {
   try {
     const softwareController = new SoftwareController();
@@ -56,6 +57,12 @@ app.get('/aur/info/:name', async (req, res) => {
   }
 });
 
+//Return all software in the database
+app.get('/all', async (_req, res) => {
+  const softwareController = new SoftwareController();
+  const response = await softwareController.getAll();
+  res.json(response);
+});
 /*
 
 PACKAGE SEARCH ENDPOINT
