@@ -27,7 +27,8 @@ CREATE TABLE "Software" (
     "version" TEXT NOT NULL,
     "dependencies" TEXT[],
     "description" TEXT,
-    "lastModified" TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "lastModified" TIMESTAMP(3) NOT NULL,
+    "lastRequested" TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "license" TEXT[],
     "url" TEXT,
 

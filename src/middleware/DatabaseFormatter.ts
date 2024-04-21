@@ -4,7 +4,9 @@ import dayjs from 'dayjs';
 
 export function convertFromAurToDatabaseFormat(rawData: any) {
   const lastModifiedUnix = rawData.LastModified;
-  const lastModified = dayjs(lastModifiedUnix).format();
+  const lastModified = dayjs(lastModifiedUnix * 1000).format();
+
+  console.log(lastModifiedUnix, lastModified);
 
   const formattedData = {
     name: rawData.Name,

@@ -1,13 +1,14 @@
 import { PrismaClient } from '@prisma/client';
+import dayjs from 'dayjs';
 
 const prisma = new PrismaClient();
 
 async function seedSoftware() {
   try {
     const softwareData = [
-      { name: 'slack', version: '1.0.0' },
-      { name: 'vscode', version: '2.3.1' },
-      { name: 'discord', version: '3.2.0' },
+      { name: 'slack', version: '1.0.0', lastModified: new Date() },
+      { name: 'vscode', version: '2.3.1', lastModified: new Date() },
+      { name: 'discord', version: '3.2.0', lastModified: new Date() },
     ];
 
     const packageSourceData = [

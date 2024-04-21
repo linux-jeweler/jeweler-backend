@@ -3,10 +3,12 @@ import { PrismaClient, Prisma } from '@prisma/client';
 export const prisma = new PrismaClient();
 
 class SoftwareOnSourceController {
+  //Creating a new entry in the database
   async create(data: Prisma.SoftwareOnSourceCreateInput) {
     return prisma.softwareOnSource.create({ data });
   }
 
+  //Reading from the database using different fields
   async getBySoftwareId(softwareId: string) {
     return prisma.softwareOnSource.findFirst({ where: { softwareId } });
   }
@@ -19,6 +21,7 @@ class SoftwareOnSourceController {
     return prisma.softwareOnSource.findFirst({ where: { distroId } });
   }
 
+  //Updating the database using different fields
   async updateBySoftwareId(
     softwareId: string,
     data: Prisma.SoftwareOnSourceUpdateInput
@@ -40,6 +43,7 @@ class SoftwareOnSourceController {
     return prisma.softwareOnSource.updateMany({ where: { distroId }, data });
   }
 
+  //Deleting from the database using different fields
   async deleteBySoftwareID(softwareId: string) {
     return prisma.softwareOnSource.deleteMany({ where: { softwareId } });
   }

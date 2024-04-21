@@ -36,7 +36,8 @@ model Software {
   version       String
   dependencies  String[]
   description   String?
-  lastModified  DateTime            @default(now()) @db.Timestamp(0)
+  lastModified  DateTime            
+  lastRequested DateTime            @default(now()) @db.Timestamp(0)            
   license       String[]
   url           String?
 
