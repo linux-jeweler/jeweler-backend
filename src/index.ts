@@ -28,21 +28,23 @@ app.get('/aur/info/:name', async (req, res) => {
 
     //If software is in database return it
     if (databaseResult) {
-      console.log('Software found in database');
       res.json(databaseResult);
 
       //If software is not in database check AUR by calling getAurInfo
     } else {
-      console.log('Not in database, checking AUR');
       const aurResult = await getAurInfo(name);
 
       //If software is in AUR add it to the database and return it
       if (aurResult) {
-        console.log('Software found in AUR');
         const databasePayload = convertFromAurToDatabaseFormat(aurResult);
         await softwareController.create(databasePayload);
 
-        res.json(databasePayload);
+        //Return the software from the database
+        const response = await softwareController.getByName(
+          databasePayload.name
+        );
+
+        res.json(response);
 
         //If software is neither in database nor in AUR return not found
       } else {

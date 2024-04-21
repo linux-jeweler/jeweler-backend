@@ -12,7 +12,7 @@ class DistroController {
   }
 
   async getAll() {
-    return prisma.linuxDistro.findMany;
+    return prisma.linuxDistro.findMany();
   }
 
   async update(id: string, data: Prisma.LinuxDistroUpdateInput) {

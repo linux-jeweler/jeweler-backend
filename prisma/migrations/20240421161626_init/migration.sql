@@ -14,6 +14,7 @@ CREATE TABLE "PackageSource" (
     "image" TEXT,
     "info" TEXT,
     "description" TEXT,
+    "url" TEXT,
     "trustedStatus" BOOLEAN NOT NULL,
 
     CONSTRAINT "PackageSource_pkey" PRIMARY KEY ("id")
