@@ -10,4 +10,6 @@ COPY . .
 
 EXPOSE 3001
 
-CMD ["npm", "start"]
+RUN npm run build
+
+CMD ["node", "dist/src/index.js"]

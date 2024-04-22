@@ -1,11 +1,16 @@
 {
-  "name": "webdev-playground",
+  "name": "jeweler-backend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node src/index.ts",
-    "dev": "ts-node-dev src/index.ts"
+    "dev": "ts-node-dev src/index.ts",
+    "build": "rm -rf ./dist/* && tsc",
+    "db:format": "prisma format",
+    "db:generate": "npm run db:format && prisma generate",
+    "db:migrate": "npm run db:generate && prisma migrate dev --name migration",
+    "db:reset": "prisma migrate reset --force && npm run db:migrate"
   },
   "author": "",
   "license": "ISC",
@@ -44,8 +49,5 @@
     "yn": "^3.1.1"
   },
   "keywords": [],
-  "description": "",
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
-  }
+  "description": ""
 }
