@@ -9,7 +9,7 @@ RUN npm install
 COPY . .
 
 ARG DATABASE_URL
-ENV DATABASE_URL=${DATABASE_URL}
+ENV DATABASE_URL=test2
 
 RUN npx prisma generate
 
