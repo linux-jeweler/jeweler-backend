@@ -1,7 +1,7 @@
 import axios from 'axios';
 import '../../data-source';
 
-export const ARCH_AUR = 'https://aur.archlinux.org';
+export const ARCH_AUR = 'https://aur.archlinux.org/rpc/v5';
 
 export async function getAurInfo(name: string) {
   //takes package name as input and returns package info from AUR
