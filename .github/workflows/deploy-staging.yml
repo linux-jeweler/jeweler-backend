@@ -18,9 +18,8 @@ jobs:
           heroku_app_name: "jeweler-backend-staging"
           heroku_email: "niklasjacobsen4201@gmail.com"
           usedocker: true
+          procfile: "Procfile"
           docker_build_args: |
-            NODE_ENV
             DATABSE_URL
         env:
-          NODE_ENV: ${{ secrets.ENV }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
