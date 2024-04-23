@@ -21,4 +21,4 @@ jobs:
           docker_build_args: |
             DATABSE_URL
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: test
