@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -17,3 +18,7 @@ jobs:
           heroku_app_name: "jeweler-backend-staging"
           heroku_email: "niklasjacobsen4201@gmail.com"
           usedocker: true
+          docker_build_args: |
+            DATABSE_URL
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
