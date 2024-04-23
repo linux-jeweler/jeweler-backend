@@ -19,6 +19,8 @@ jobs:
           heroku_email: "niklasjacobsen4201@gmail.com"
           usedocker: true
           docker_build_args: |
+            NODE_ENV
             DATABSE_URL
         env:
+          NODE_ENV: ${{ secrets.ENV }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
