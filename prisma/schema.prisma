@@ -13,13 +13,16 @@ model LinuxDistro {
   name          String
   version       String
 
-  packageSources PackageSource[]
+  packageSources    PackageSource[]
   softwareOnSources SoftwareOnSource[]
+  users             User[]
+
+  @@unique([name, version])
 }
 
 model PackageSource {
   id            String              @id @default(uuid())
-  name          String
+  name          String              @unique
   image         String?
   info          String?
   description   String?
@@ -38,12 +41,13 @@ model Software {
   dependencies  String[]
   description   String?
   lastModified  DateTime            
-  lastRequested DateTime            @default(now()) @db.Timestamp(0)            
+  lastRequested DateTime            @updatedAt        
   license       String[]
   url           String?
 
-  packageSources PackageSource[]
+  packageSources    PackageSource[]
   softwareOnSources SoftwareOnSource[]
+  users             User[] 
 }
 
 model SoftwareOnSource {
@@ -61,3 +65,13 @@ model SoftwareOnSource {
   @@id([softwareId, sourceId, distroId])
 }
 
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  likedPackages Software[]
+  usedDistros   LinuxDistro[]
+}

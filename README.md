@@ -1,6 +1,8 @@
-# Jeweler Backend
+# Jeweler - A web-based tool to simplify package installations on Linux
 
-A brief description of the project.
+Getting started with Linux can be really difficult for people without a technical background. Since different distributions of Linux can have varying ways to install new software and most require the knowledge of using the terminal, beginners can easily be deterred from considering Linux as their operating system.
+
+Jeweler aims to make this process more straightforward for beginners by determining a user's Linux distribution to provide only compatible software sources. Users can search for software they wish to install and Jeweler serves every compatible source with detailed information about the steps necessary for installation.
 
 ## Table of Contents
 
