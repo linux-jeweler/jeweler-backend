@@ -18,7 +18,7 @@ jobs:
           heroku_app_name: "jeweler-backend-staging"
           heroku_email: "niklasjacobsen4201@gmail.com"
           usedocker: true
-          procfile: "Procfile"
+          procfile: "release: npx prisma migrate deploy"
           docker_build_args: |
             DATABSE_URL
         env:
