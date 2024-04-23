@@ -8,7 +8,12 @@ RUN npm install
 
 COPY . .
 
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
 RUN npx prisma generate
+
+RUN npx prisma migrate deploy
 
 EXPOSE 3001
 

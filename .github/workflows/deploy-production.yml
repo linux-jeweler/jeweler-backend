@@ -1,23 +1,23 @@
-name: Deploy Staging
+name: Deploy Production
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - staging
+      - main
 
 jobs:
-  build:  
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: AkhileshNS/heroku-deploy@v3.13.15
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "jeweler-backend-staging"
+          heroku_app_name: "jeweler-backend-prod"
           heroku_email: "niklasjacobsen4201@gmail.com"
           usedocker: true
           docker_build_args: |
             DATABASE_URL
         env:
-          DATABASE_URL: ${{secrets.STAGING_DATABASE_URL}}
+          DATABASE_URL: ${{secrets.PRODUCTION_DATABASE_URL}}
