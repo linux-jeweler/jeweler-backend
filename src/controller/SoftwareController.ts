@@ -11,6 +11,13 @@ class SoftwareController {
     return prisma.software.findUnique({ where: { id } });
   }
 
+  async getManyByName(name: string) {
+    const result =
+      await prisma.$queryRaw`SELECT * FROM "Software" WHERE name ILIKE '%' || ${name} || '%' OR name % ${name};`;
+
+    return result;
+  }
+
   async getByName(name: string) {
     return prisma.software.findFirst({ where: { name } });
   }

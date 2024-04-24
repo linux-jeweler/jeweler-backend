@@ -1,40 +1,59 @@
 import express from 'express';
 import './data-source';
 import cors from 'cors';
-import dayjs from 'dayjs';
-import 'dayjs/plugin/relativeTime';
 import { getAurInfo } from './curator/sources/arch_aur';
 import SoftwareController from './controller/SoftwareController';
 import { convertFromAurToDatabaseFormat } from './helpers/DatabaseFormatter';
 import { isYoungerThan24Hours } from './helpers/TimeHelpers';
-import e from 'express';
 
 const port = process.env.PORT || 3001;
 const app = express();
-const router = express.Router();
 
-const relativeTime = require('dayjs/plugin/relativeTime');
-dayjs.extend(relativeTime);
 app.use(express.json());
 app.use(cors());
-app.use(router);
+
+const softwareController = new SoftwareController();
 
 app.get('/', (_req, res) => {
   res.json({ message: 'If you can read this the backend is running' });
 });
 
-//AUR info endpoint
-app.get('/aur/info/:name', async (req, res) => {
-  try {
-    const softwareController = new SoftwareController();
+app.get('/search/', (_req, res) => {
+  res.json('No search query provided');
+});
 
+app.get('/search/:query', async (req, res) => {
+  try {
+    const query = req.params.query;
+
+    if (query.length < 3) {
+      res.json('Search query too short');
+      return;
+    }
+
+    const response = await softwareController.getManyByName(query);
+
+    if (Array.isArray(response) && response.length === 0) {
+      res.json('No software found');
+      return;
+    }
+
+    res.json(response);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+});
+
+//AUR info endpoint
+app.get('/info/aur/:name', async (req, res) => {
+  try {
     const name = req.params.name;
     const databaseResult = await softwareController.getByName(name);
 
     //Todo: Move this logic to a service to be called from multiple endpoints
 
     //If software is in database and entry is younger than 24 hours, return it
-    if (databaseResult && isYoungerThan24Hours(databaseResult.lastRequested)) {
+    if (databaseResult && isYoungerThan24Hours(databaseResult.updatedAt)) {
       res.json(databaseResult);
 
       //If software is not in database or older than 24 hours check AUR by calling getAurInfo
@@ -44,13 +63,13 @@ app.get('/aur/info/:name', async (req, res) => {
       //If software is in AUR add it to the database and return it
       if (aurResult) {
         const databasePayload = convertFromAurToDatabaseFormat(aurResult);
-        await softwareController.create(databasePayload);
+        await softwareController.create(databasePayload.softwareData);
 
         //Todo: If software is in database but older than 24 hours update it
 
         //Return the software from the database
         const response = await softwareController.getByName(
-          databasePayload.name
+          databasePayload.softwareData.name
         );
 
         res.json(response);
@@ -88,5 +107,3 @@ query database with search string
 app.listen(port, () => {
   console.log(`App running on Port ${port}`);
 });
-
-module.exports = router;
