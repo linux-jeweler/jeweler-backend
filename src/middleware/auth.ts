@@ -1,36 +1,35 @@
-import { Secret, JwtPayload } from 'jsonwebtoken';
-import '../data-source';
-import { Request, Response, NextFunction } from 'express';
-import { AuthController } from '../controller/AuthController';
+// import { Secret, JwtPayload } from 'jsonwebtoken';
+// import { Request, Response, NextFunction } from 'express';
+// import { AuthController } from '../controller/AuthController';
 
-export const SECRET_KEY: Secret = process.env.SECRET_KEY;
+// export const SECRET_KEY: Secret = process.env.JWT_SECRET;
 
-export interface CustomRequest extends Request {
-  token: string | JwtPayload;
-}
+// export interface CustomRequest extends Request {
+//   token: string | JwtPayload;
+// }
 
-export const auth = async (req: Request, res: Response, next: NextFunction) => {
-  const authController = new AuthController();
-  try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+// export const auth = async (req: Request, res: Response, next: NextFunction) => {
+//   const authController = new AuthController();
+//   try {
+//     const token = req.header('Authorization')?.replace('Bearer ', '');
 
-    if (!token) {
-      throw new Error();
-    }
+//     if (!token) {
+//       throw new Error();
+//     }
 
-    const decoded = await authController.verifyJWT(token);
-    if (!decoded) {
-      throw new Error();
-    }
+//     const decoded = await authController.verifyJWT(token);
+//     if (!decoded) {
+//       throw new Error();
+//     }
 
-    res.locals.userId = decoded;
-    res.locals.token = token;
+//     res.locals.userId = decoded;
+//     res.locals.token = token;
 
-    next();
-  } catch (err) {
-    res.status(401).json({
-      status: 'error',
-      message: 'Could not authenticate',
-    });
-  }
-};
+//     next();
+//   } catch (err) {
+//     res.status(401).json({
+//       status: 'error',
+//       message: 'Could not authenticate',
+//     });
+//   }
+// };

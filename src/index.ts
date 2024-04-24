@@ -3,11 +3,10 @@ import './data-source';
 import cors from 'cors';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/relativeTime';
-import { getAurInfo } from './curator/sources/arch_aur';
+import { getAurInfo, syncDatabaseWithAur } from './curator/sources/arch_aur';
 import SoftwareController from './controller/SoftwareController';
 import { convertFromAurToDatabaseFormat } from './helpers/DatabaseFormatter';
 import { isYoungerThan24Hours } from './helpers/TimeHelpers';
-import e from 'express';
 
 const port = process.env.PORT || 3001;
 const app = express();
@@ -90,3 +89,5 @@ app.listen(port, () => {
 });
 
 module.exports = router;
+
+syncDatabaseWithAur();

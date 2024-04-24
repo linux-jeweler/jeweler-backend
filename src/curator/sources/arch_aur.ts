@@ -1,7 +1,7 @@
 import axios from 'axios';
 import '../../data-source';
-import e from 'express';
 
+const SYNC_INTERVAL = process.env.SYNC_INTERVAL || '1440';
 export const ARCH_AUR = 'https://aur.archlinux.org';
 
 //takes package name as input and returns package info from AUR
@@ -39,5 +39,8 @@ export async function performAurSearch(query: string) {
   }
 }
 
-export async function syncDatabaseWithAur() {
+export async function syncDatabaseWithAur() {}
 
+async function downloadAurDatabase() {}
+
+//setInterval(syncDatabaseWithAur, parseInt(SYNC_INTERVAL) * 60 * 1000);
