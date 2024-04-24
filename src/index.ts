@@ -18,22 +18,32 @@ app.use(express.json());
 app.use(cors());
 app.use(router);
 
+const softwareController = new SoftwareController();
+
 app.get('/', (_req, res) => {
   res.json({ message: 'If you can read this the backend is running' });
+});
+
+app.get('/search/:query', async (req, res) => {
+  try {
+    const query = req.params.query;
+    const response = await softwareController.getManyByName(query);
+    res.json(response);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
 });
 
 //AUR info endpoint
 app.get('/aur/info/:name', async (req, res) => {
   try {
-    const softwareController = new SoftwareController();
-
     const name = req.params.name;
     const databaseResult = await softwareController.getByName(name);
 
     //Todo: Move this logic to a service to be called from multiple endpoints
 
     //If software is in database and entry is younger than 24 hours, return it
-    if (databaseResult && isYoungerThan24Hours(databaseResult.lastRequested)) {
+    if (databaseResult && isYoungerThan24Hours(databaseResult.updatedAt)) {
       res.json(databaseResult);
 
       //If software is not in database or older than 24 hours check AUR by calling getAurInfo
@@ -89,5 +99,3 @@ app.listen(port, () => {
 });
 
 module.exports = router;
-
-syncDatabaseWithAur();

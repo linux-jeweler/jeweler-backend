@@ -19,3 +19,5 @@ class UserController {
     return prisma.user.delete({ where: { id } });
   }
 }
+
+export default UserController;
