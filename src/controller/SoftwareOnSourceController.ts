@@ -1,6 +1,5 @@
-import { PrismaClient, Prisma } from '@prisma/client';
-
-export const prisma = new PrismaClient();
+import { prisma } from '../data-source';
+import { Prisma } from '@prisma/client';
 
 class SoftwareOnSourceController {
   //Creating a new entry in the database

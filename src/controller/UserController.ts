@@ -1,6 +1,5 @@
-import { PrismaClient, Prisma } from '@prisma/client';
-
-export const prisma = new PrismaClient();
+import { Prisma } from '@prisma/client';
+import { prisma } from '../data-source';
 
 class UserController {
   async create(data: Prisma.UserCreateInput) {

@@ -1,10 +1,8 @@
-import { isYoungerThan24Hours } from '../../src/helpers/TimeHelpers';
+import UserController from '../../src/controller/UserController';
 
-test('isYoungerThan24Hours', () => {
-  const currentDate = new Date();
-  const olderDate = new Date(currentDate);
-  olderDate.setHours(currentDate.getHours() - 25);
+test('userController', async () => {
+  const uc = new UserController();
+  const user = await uc.create({ email: 'test@test.de', password: 'test' });
 
-  expect(isYoungerThan24Hours(currentDate)).toBe(true);
-  expect(isYoungerThan24Hours(olderDate)).toBe(false);
+  expect(user.email).toBe('test@test.de');
 });

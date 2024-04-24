@@ -1,6 +1,5 @@
-import { PrismaClient, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../data-source';
+import { Prisma } from '@prisma/client';
 
 class SoftwareController {
   async create(data: Prisma.SoftwareCreateInput) {
