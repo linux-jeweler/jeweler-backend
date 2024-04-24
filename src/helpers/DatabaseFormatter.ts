@@ -6,7 +6,7 @@ export function convertFromAurToDatabaseFormat(rawData: any) {
   const lastModifiedUnix = rawData.LastModified;
   const lastModified = dayjs(lastModifiedUnix * 1000).format();
 
-  const formattedData = {
+  const formattedSoftwareData = {
     name: rawData.Name,
     version: rawData.Version,
     dependencies: rawData.Depends,
@@ -14,13 +14,19 @@ export function convertFromAurToDatabaseFormat(rawData: any) {
     lastModified: lastModified,
     license: rawData.License,
     url: rawData.URL,
-
-    // instructions:
-    //   'Copy the command below and paste it into your terminal to install' +
-    //   rawData.Name,
-    // installCommand: 'yay -S ' + rawData.Name,
-    // downloadUrl: 'https://aur.archlinux.org/packages/' + rawData.Name,
   };
 
-  return formattedData;
+  const formattedSoftwareSourceData = {
+    instructions:
+      'Copy the command below and paste it into your terminal to install' +
+      rawData.Name,
+    installCommand: 'yay -S ' + rawData.Name,
+    downloadUrl: 'https://aur.archlinux.org/packages/' + rawData.Name,
+    trustedStatus: true,
+  };
+
+  return {
+    softwareData: formattedSoftwareData,
+    softwareSourceData: formattedSoftwareSourceData,
+  };
 }
