@@ -8,3 +8,13 @@ test('isYoungerThan24Hours', () => {
   expect(isYoungerThan24Hours(currentDate)).toBe(true);
   expect(isYoungerThan24Hours(olderDate)).toBe(false);
 });
+import { getTodaysDate } from '../../src/helpers/TimeHelpers';
+
+test('getTodaysDate', () => {
+  const currentDate = new Date();
+  const expectedDate = currentDate.toISOString().split('T')[0];
+
+  const result = getTodaysDate();
+
+  expect(result).toBe(expectedDate);
+});

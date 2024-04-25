@@ -7,10 +7,11 @@ class SoftwareOnSourceController {
     return prisma.softwareOnSource.create({ data });
   }
 
-  async getManyByName(name: string, distro: string) {
-    return prisma.softwareOnSource.findMany({
-      where: { distroName: distro, softwareName: { search: name } },
-    });
+  async getManyByName(name: string) {
+    const result =
+      await prisma.$queryRaw`SELECT * FROM "Software" WHERE softwareName ILIKE '%' || ${name} || '%' OR name % ${name};`;
+
+    return result;
   }
 
   async getAll() {

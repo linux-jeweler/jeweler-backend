@@ -11,3 +11,8 @@ export function isYoungerThan24Hours(date: Date): boolean {
   // Check if the date is younger than 24 hours
   return dayjs(date).isAfter(twentyFourHoursAgo);
 }
+
+export function getTodaysDate() {
+  const today = dayjs().format('YYYY-MM-DD');
+  return today;
+}

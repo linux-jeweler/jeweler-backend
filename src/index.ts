@@ -1,9 +1,9 @@
 import express from 'express';
 import './data-source';
 import cors from 'cors';
-import { getAurInfo } from './curator/sources/arch_aur';
+import { downloadAurDatabase, getAurInfo } from './curator/sources/arch_aur';
 import SoftwareController from './controller/SoftwareController';
-import { convertFromAurToDatabaseFormat } from './helpers/DatabaseFormatter';
+import { convertFromAurToDatabaseFormat } from './helpers/DatabaseHelpers';
 import { isYoungerThan24Hours } from './helpers/TimeHelpers';
 
 const port = process.env.PORT || 3001;
@@ -39,6 +39,15 @@ app.get('/search/:query', async (req, res) => {
     }
 
     res.json(response);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+});
+
+app.get('/sync', async (_req, res) => {
+  try {
+    await downloadAurDatabase();
+    res.json('Database synced with AUR');
   } catch (error) {
     console.error('Error fetching data:', error);
   }
