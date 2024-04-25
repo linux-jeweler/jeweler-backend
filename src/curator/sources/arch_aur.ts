@@ -2,10 +2,14 @@ import axios from 'axios';
 import '../../data-source';
 import fs from 'fs';
 import path from 'path';
+import SoftwareController from '../../controller/SoftwareController';
+import SoftwareOnSourceController from '../../controller/SoftwareOnSourceController';
 import { checkRecentFileExists } from '../../helpers/FileHelpers';
-import { getTodaysDate } from '../../helpers/TimeHelpers';
+import { getTodaysDate, isYoungerThan24Hours } from '../../helpers/TimeHelpers';
+import { convertFromAurToDatabaseFormat } from '../../helpers/DatabaseHelpers';
 
-const outputPath = path.join(__dirname);
+const today = getTodaysDate();
+const filePath = path.join(__dirname + '/aurDataSync_' + today + '.json');
 
 const SYNC_INTERVAL = process.env.SYNC_INTERVAL || '1440';
 export const ARCH_AUR = 'https://aur.archlinux.org';
@@ -45,49 +49,71 @@ export async function performAurSearch(query: string) {
   }
 }
 
+export async function syncDatabaseWithAur() {
+  try {
+    const aurDatabaseSnapshot = await downloadAurDatabase();
+    //if aurDatabaseSnapshot is null, return
+    if (!aurDatabaseSnapshot) {
+      return;
+    }
+
+    //get all entries from the database
+    const softwareController = new SoftwareController();
+    const databaseEntries = await softwareController.getAll();
+
+    //iterate over all entries in the database
+    for (const databaseEntry of databaseEntries) {
+      //if database entry is older than 24 hours, update it
+      if (!isYoungerThan24Hours(databaseEntry.updatedAt)) {
+        const aurResult = await getAurInfo(databaseEntry.name);
+        if (aurResult) {
+          const databasePayload = convertFromAurToDatabaseFormat(aurResult);
+          await softwareController.update(
+            databaseEntry.id,
+            databasePayload.softwareData
+          );
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+}
+
 //downloads a snapshot of the whole AUR database
 //writes it into a file and immediately reads it to prevent ENAMETOOLONG error
 export async function downloadAurDatabase() {
+  var aurDatabaseSnapshot = null;
+
   try {
     //fetch database snapshot if not already there
+    if (await checkRecentFileExists(filePath)) {
+    } else {
+      const response = await axios.get(
+        ARCH_AUR + '/packages-meta-ext-v1.json.gz',
+        { responseType: 'blob' }
+      );
 
-    console.log(
-      await checkRecentFileExists(
-        outputPath + '/aurDataSync_' + getTodaysDate + '.json'
-      )
-    );
+      //write response to file and change file ending to json
+      fs.writeFile(filePath, response.data, (error) => {
+        if (error) {
+          console.error('Error writing file: ' + error.code);
+          return null;
+        }
+      });
 
-    // const response = await axios.get(
-    //   ARCH_AUR + '/packages-meta-ext-v1.json.gz',
-    //   { responseType: 'blob' }
-    // );
-
-    // //write response to file and change file ending to json
-    // fs.writeFile(
-    //   outputPath + '/aurDataSync_' + today + '.json',
-    //   response.data,
-    //   (error) => {
-    //     if (error) {
-    //       console.error('Error writing file: ' + error.code);
-    //       return null;
-    //     }
-    //   }
-    // );
-
-    //read written file
-    fs.readFile(
-      outputPath + '/aurDataSync_' + getTodaysDate + '.json',
-      'utf8',
-      (error, data) => {
+      //read written file
+      fs.readFile(filePath, 'utf8', (error, data) => {
         if (error) {
           console.error('Error reading file: ' + error.code);
           return null;
         }
 
-        const aurDatabaseSnapshot = JSON.parse(data);
-        return aurDatabaseSnapshot;
-      }
-    );
+        aurDatabaseSnapshot = JSON.parse(data);
+      });
+    }
+
+    return aurDatabaseSnapshot;
   } catch (error) {
     console.error('Error fetching data:', error);
   }
