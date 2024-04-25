@@ -59,6 +59,7 @@ export async function syncDatabaseWithAur() {
 
     //get all entries from the database
     const softwareController = new SoftwareController();
+    const softwareOnSourceController = new SoftwareOnSourceController();
     const databaseEntries = await softwareController.getAll();
 
     //iterate over all entries in the database
@@ -72,6 +73,8 @@ export async function syncDatabaseWithAur() {
             databaseEntry.id,
             databasePayload.softwareData
           );
+          // await softwareOnSourceController.update(
+          // );
         }
       }
     }
