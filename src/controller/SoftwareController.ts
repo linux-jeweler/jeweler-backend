@@ -1,5 +1,6 @@
 import { prisma } from '../data-source';
 import { Prisma } from '@prisma/client';
+import { SoftwareSourceData } from '../helpers/DatabaseHelpers';
 
 class SoftwareController {
   async create(data: Prisma.SoftwareCreateInput) {
@@ -18,15 +19,55 @@ class SoftwareController {
   }
 
   async getByName(name: string) {
-    return prisma.software.findFirst({ where: { name } });
+    return prisma.software.findFirst({
+      where: { name },
+      include: {
+        softwareOnSources: {
+          select: {
+            instructions: true,
+            installCommand: true,
+            downloadLink: true,
+            source: true,
+          },
+        },
+      },
+    });
   }
 
   async getAll() {
     return prisma.software.findMany();
   }
 
-  async update(id: string, data: Prisma.SoftwareUpdateInput) {
-    return prisma.software.update({ where: { id }, data });
+  async getAllWithSources() {
+    return prisma.software.findMany({
+      include: {
+        softwareOnSources: {
+          select: {
+            installCommand: true,
+            downloadLink: true,
+            instructions: true,
+            source: true,
+          },
+        },
+      },
+    });
+  }
+
+  async upsert(data: SoftwareSourceData) {
+    return prisma.software.upsert({
+      where: { name: data.softwareData.name },
+      create: {
+        ...data.softwareData,
+        softwareOnSources: {
+          create: {
+            ...data.softwareSourceData,
+            source: { connect: { name: data.softwareSourceData.source } },
+          },
+        },
+      },
+
+      update: data.softwareData,
+    });
   }
 
   async delete(id: string) {

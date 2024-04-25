@@ -3,10 +3,12 @@ import '../../data-source';
 import fs from 'fs';
 import path from 'path';
 import SoftwareController from '../../controller/SoftwareController';
-import SoftwareOnSourceController from '../../controller/SoftwareOnSourceController';
 import { checkRecentFileExists } from '../../helpers/FileHelpers';
 import { getTodaysDate, isYoungerThan24Hours } from '../../helpers/TimeHelpers';
-import { convertFromAurToDatabaseFormat } from '../../helpers/DatabaseHelpers';
+import {
+  SoftwareSourceData,
+  convertFromAurToDatabaseFormat,
+} from '../../helpers/DatabaseHelpers';
 
 const today = getTodaysDate();
 const filePath = path.join(__dirname + '/aurDataSync_' + today + '.json');
@@ -59,7 +61,6 @@ export async function syncDatabaseWithAur() {
 
     //get all entries from the database
     const softwareController = new SoftwareController();
-    const softwareOnSourceController = new SoftwareOnSourceController();
     const databaseEntries = await softwareController.getAll();
 
     //iterate over all entries in the database
@@ -69,18 +70,29 @@ export async function syncDatabaseWithAur() {
         const aurResult = await getAurInfo(databaseEntry.name);
         if (aurResult) {
           const databasePayload = convertFromAurToDatabaseFormat(aurResult);
-          await softwareController.update(
-            databaseEntry.id,
-            databasePayload.softwareData
-          );
-          // await softwareOnSourceController.update(
-          // );
+
+          //update database entry
         }
       }
     }
   } catch (error) {
     console.error('Error fetching data:', error);
   }
+}
+
+//Takes in a single json object and inserts it into the database
+export async function insertIntoDatabase(objectToInsert: SoftwareSourceData) {
+  const softwareController = new SoftwareController();
+
+  //insert software into database
+  await softwareController.upsert(objectToInsert);
+
+  //insert software source into database
+  // await softwareOnSourceController.create({
+  //   ...objectToInsert.softwareSourceData,
+  //   source: { connect: { name: objectToInsert.softwareSourceData.source } },
+  //   software: { connect: { name: objectToInsert.softwareData.name } },
+  // });
 }
 
 //downloads a snapshot of the whole AUR database

@@ -10,6 +10,10 @@ class DistroController {
     return prisma.linuxDistro.findUnique({ where: { id } });
   }
 
+  async getByName(name: string) {
+    return prisma.linuxDistro.findFirst({ where: { name } });
+  }
+
   async getAll() {
     return prisma.linuxDistro.findMany();
   }

@@ -10,6 +10,10 @@ class UserController {
     return prisma.user.findUnique({ where: { id } });
   }
 
+  getByEmail(email: string) {
+    return prisma.user.findFirst({ where: { email } });
+  }
+
   async update(id: string, data: Prisma.UserUpdateInput) {
     return prisma.user.update({ where: { id }, data });
   }

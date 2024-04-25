@@ -3,8 +3,11 @@ import './data-source';
 import cors from 'cors';
 import { downloadAurDatabase, getAurInfo } from './curator/sources/arch_aur';
 import SoftwareController from './controller/SoftwareController';
+import UserController from './controller/UserController';
+import AuthController from './controller/AuthController';
 import { convertFromAurToDatabaseFormat } from './helpers/DatabaseHelpers';
 import { isYoungerThan24Hours } from './helpers/TimeHelpers';
+import { insertIntoDatabase } from './curator/sources/arch_aur';
 
 const port = process.env.PORT || 3001;
 const app = express();
@@ -13,12 +16,46 @@ app.use(express.json());
 app.use(cors());
 
 const softwareController = new SoftwareController();
+const userController = new UserController();
+const authController = new AuthController();
 
 app.get('/', (_req, res) => {
-  res.json({ message: 'If you can read this the backend is running' });
+  try {
+    res.json({ message: 'If you can read this the backend is running' });
+  } catch (error) {
+    console.error('Error loading backend: ', error);
+  }
 });
 
-app.get('/search/', (_req, res) => {
+app.get('/software/info/:name', async (req, res) => {
+  try {
+    const name = req.params.name;
+    const response = await softwareController.getByName(name);
+    res.json(response);
+  } catch (error) {
+    console.error('Error fetching data: ', error);
+  }
+});
+
+app.get('/software/all', async (_req, res) => {
+  try {
+    const response = await softwareController.getAll();
+    res.json(response);
+  } catch (error) {
+    console.error('Error fetching data: ', error);
+  }
+});
+
+app.get('/software/allsources', async (_req, res) => {
+  try {
+    const response = await softwareController.getAllWithSources();
+    res.json(response);
+  } catch (error) {
+    console.error('Error fetching data: ', error);
+  }
+});
+
+app.get('/search/', async (_req, res) => {
   res.json('No search query provided');
 });
 
@@ -40,16 +77,27 @@ app.get('/search/:query', async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error('Error fetching data: ', error);
   }
 });
+
+// app.get('/find', async (req, res) => {
+//   try {
+//     const userAgent = req.headers['user-agent'];
+
+//     const response = await validateUserAgent(userAgent);
+//     res.json(response);
+//   } catch (error) {
+//     console.error('Error fetching data:', error);
+//   }
+// });
 
 app.get('/sync', async (_req, res) => {
   try {
     await downloadAurDatabase();
     res.json('Database synced with AUR');
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error('Error fetching data: ', error);
   }
 });
 
@@ -72,16 +120,17 @@ app.get('/info/aur/:name', async (req, res) => {
       //If software is in AUR add it to the database and return it
       if (aurResult) {
         const databasePayload = convertFromAurToDatabaseFormat(aurResult);
-        await softwareController.create(databasePayload.softwareData);
+        await insertIntoDatabase(databasePayload);
 
         //Todo: If software is in database but older than 24 hours update it
 
         //Return the software from the database
-        const response = await softwareController.getByName(
-          databasePayload.softwareData.name
-        );
+        // const response = await softwareController.getByName(
+        //   databasePayload.softwareData.name
+        // );
 
-        res.json(response);
+        // res.json(response);
+        res.json(databasePayload.softwareData);
 
         //If software is neither in database nor in AUR return not found
       } else {
@@ -89,29 +138,46 @@ app.get('/info/aur/:name', async (req, res) => {
       }
     }
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error('Error fetching data: ', error);
   }
 });
 
-//Return all software in the database
-app.get('/all', async (_req, res) => {
-  const softwareController = new SoftwareController();
-  const response = await softwareController.getAll();
-  res.json(response);
+app.post('/register', async (req, res) => {
+  try {
+    const user = await userController.create({
+      email: req.body.email,
+      password: await authController.hashPassword(req.body.password),
+    });
+    res.json(user);
+  } catch (error) {
+    console.error('Error: ', error);
+    res.status(400).json({ error: 'Error registering user' });
+  }
 });
-/*
 
-PACKAGE SEARCH ENDPOINT
+app.post('/login', async (req, res) => {
+  try {
+    const user = await userController.getByEmail(req.body.email);
 
-takes input from search query
-returns a list of packages that match the search query from unified package database
-if there are no matching packages perform search query on source APIs
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
 
-query database with search string
-
-
-
-*/
+    if (await authController.verifyPassword(req.body.password, user.password)) {
+      res.status(200).json({
+        status: 'success',
+        message: 'User logged in',
+        token: authController.generateJWT(user.id),
+      });
+    } else {
+      res.status(401).json({ error: 'Invalid password' });
+    }
+  } catch (error) {
+    console.error('Error: ', error);
+    res.status(400).json({ error: 'Error logging in' });
+  }
+});
 
 app.listen(port, () => {
   console.log(`App running on Port ${port}`);

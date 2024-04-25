@@ -30,11 +30,11 @@ CREATE TABLE "Software" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "version" TEXT NOT NULL,
-    "dependencies" TEXT[],
     "description" TEXT,
+    "dependencies" TEXT[],
     "lastModified" TIMESTAMP(3) NOT NULL,
-    "license" TEXT[],
     "url" TEXT,
+    "license" TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -45,12 +45,13 @@ CREATE TABLE "Software" (
 CREATE TABLE "SoftwareOnSource" (
     "softwareName" TEXT NOT NULL,
     "sourceName" TEXT NOT NULL,
-    "distroName" TEXT NOT NULL,
     "installCommand" TEXT,
     "instructions" TEXT,
     "downloadLink" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "SoftwareOnSource_pkey" PRIMARY KEY ("softwareName","sourceName","distroName")
+    CONSTRAINT "SoftwareOnSource_pkey" PRIMARY KEY ("softwareName","sourceName")
 );
 
 -- CreateTable
@@ -129,9 +130,6 @@ CREATE UNIQUE INDEX "_SoftwareToUser_AB_unique" ON "_SoftwareToUser"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_SoftwareToUser_B_index" ON "_SoftwareToUser"("B");
-
--- AddForeignKey
-ALTER TABLE "SoftwareOnSource" ADD CONSTRAINT "SoftwareOnSource_distroName_fkey" FOREIGN KEY ("distroName") REFERENCES "LinuxDistro"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "SoftwareOnSource" ADD CONSTRAINT "SoftwareOnSource_softwareName_fkey" FOREIGN KEY ("softwareName") REFERENCES "Software"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
