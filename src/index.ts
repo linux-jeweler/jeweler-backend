@@ -4,14 +4,14 @@ import cors from 'cors';
 import expressAsyncHandler from 'express-async-handler';
 import { validateRequest } from 'zod-express-middleware';
 import { zodSchema } from './controller/AuthController';
-import { getAurInfo, syncDatabaseWithAur2 } from './curator/sources/arch_aur';
+import { syncDatabaseWithAur2 } from './curator/sources/arch_aur';
 import SoftwareController from './controller/SoftwareController';
 import UserController from './controller/UserController';
 import AuthController from './controller/AuthController';
 import { convertFromAurToDatabaseFormat } from './helpers/DatabaseHelpers';
 import { isYoungerThan24Hours } from './helpers/TimeHelpers';
-import { insertIntoDatabase } from './curator/sources/arch_aur';
 import { auth } from './middleware/auth';
+import { getAurPackageInfo, getGeneralPackageInfo } from './curator/curator';
 
 const port = process.env.PORT || 3001;
 const app = express();
@@ -35,7 +35,7 @@ app.get(
   '/software/info/:name',
   asyncHandler(async (req, res) => {
     const name = req.params.name;
-    const response = await softwareController.getByName(name);
+    const response = await getGeneralPackageInfo(name);
     res.json(response);
   })
 );
@@ -108,50 +108,21 @@ app.post(
   })
 );
 
-//AUR info endpoint
+//request info about an aur package from the database
 app.get(
-  '/aur/info/:name',
+  '/info/aur/:name',
   asyncHandler(async (req, res) => {
-    try {
-      const name = req.params.name;
-      const databaseResult = await softwareController.getByName(name);
-
-      //Todo: Move this logic to a service to be called from multiple endpoints
-
-      //If software is in database and entry is younger than 24 hours, return it
-      if (databaseResult && isYoungerThan24Hours(databaseResult.updatedAt)) {
-        res.json(databaseResult);
-
-        //If software is not in database or older than 24 hours check AUR by calling getAurInfo
-      } else {
-        const aurResult = await getAurInfo(name);
-
-        //If software is in AUR add it to the database and return it
-        if (aurResult) {
-          const databasePayload = convertFromAurToDatabaseFormat(aurResult);
-          await insertIntoDatabase(databasePayload);
-
-          //Todo: If software is in database but older than 24 hours update it
-
-          //Return the software from the database
-          // const response = await softwareController.getByName(
-          //   databasePayload.softwareData.name
-          // );
-
-          // res.json(response);
-          res.json(databasePayload.softwareData);
-
-          //If software is neither in database nor in AUR return not found
-        } else {
-          res.json('No software found');
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching data: ', error);
+    const name = req.params.name;
+    const response = await getAurPackageInfo(name);
+    if (response === undefined) {
+      res.json('Package not found');
+      return;
     }
+    res.json(response);
   })
 );
 
+//gets details about user by id. requires authorization
 app.get(
   '/user/:id',
   [auth],

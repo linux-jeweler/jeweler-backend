@@ -20,7 +20,7 @@ const SYNC_INTERVAL = process.env.SYNC_INTERVAL || '1440';
 export const ARCH_AUR = 'https://aur.archlinux.org';
 
 //takes package name as input and returns package info from AUR
-export async function getAurInfo(name: string) {
+export const requestSinglePackageFromAur = async (name: string) => {
   try {
     const response = await axios.get(ARCH_AUR + '/rpc/v5' + '/info/' + name);
 
@@ -33,7 +33,7 @@ export async function getAurInfo(name: string) {
   } catch (error) {
     console.error('Error getting AUR Info: ', error);
   }
-}
+};
 
 //takes search query as input and returns list of packages from AUR
 export async function performAurSearch(query: string) {
@@ -92,12 +92,6 @@ export async function syncDatabaseWithAur2() {
   } catch (error) {
     console.error('Error syncing with AUR database: ', error);
   }
-}
-
-//Takes in a single json object and inserts it into the database
-export async function insertIntoDatabase(objectToInsert: SoftwareSourceData) {
-  //insert or update software into database
-  await softwareController.upsert(objectToInsert);
 }
 
 //downloads a snapshot of the whole AUR database
