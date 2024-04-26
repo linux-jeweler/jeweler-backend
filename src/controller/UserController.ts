@@ -1,6 +1,5 @@
-import { PrismaClient, Prisma } from '@prisma/client';
-
-export const prisma = new PrismaClient();
+import { Prisma } from '@prisma/client';
+import { prisma } from '../data-source';
 
 class UserController {
   async create(data: Prisma.UserCreateInput) {
@@ -9,6 +8,10 @@ class UserController {
 
   async getById(id: string) {
     return prisma.user.findUnique({ where: { id } });
+  }
+
+  getByEmail(email: string) {
+    return prisma.user.findFirst({ where: { email } });
   }
 
   async update(id: string, data: Prisma.UserUpdateInput) {

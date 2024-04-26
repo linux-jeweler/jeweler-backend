@@ -1,6 +1,5 @@
-import { PrismaClient, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../data-source';
+import { Prisma } from '@prisma/client';
 
 class DistroController {
   async create(data: Prisma.LinuxDistroCreateInput) {
@@ -9,6 +8,10 @@ class DistroController {
 
   async getById(id: string) {
     return prisma.linuxDistro.findUnique({ where: { id } });
+  }
+
+  async getByName(name: string) {
+    return prisma.linuxDistro.findFirst({ where: { name } });
   }
 
   async getAll() {

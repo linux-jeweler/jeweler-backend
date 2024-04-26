@@ -1,12 +1,11 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../src/data-source';
+import { distroMockData } from './distroMockData';
 
 async function seedSoftware() {
   try {
     const softwareData = [
       { name: 'slack', version: '1.0.0', lastModified: new Date() },
-      { name: 'vscode', version: '2.3.1', lastModified: new Date() },
+      { name: 'vscodium', version: '2.3.1', lastModified: new Date() },
       { name: 'discord', version: '3.2.0', lastModified: new Date() },
     ];
 
@@ -16,11 +15,7 @@ async function seedSoftware() {
       { name: 'flathub', url: 'https://flathub.org/', trustedStatus: true },
     ];
 
-    const distroData = [
-      { name: 'arch', version: '2024.04.01' },
-      { name: 'ubuntu', version: '23.10' },
-      { name: 'fedora', version: 'F39' },
-    ];
+    const distroData = distroMockData;
 
     for (const software of softwareData) {
       const softwareExists = await prisma.software.findFirst({
