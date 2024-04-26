@@ -8,8 +8,6 @@ import { syncDatabaseWithAur2 } from './curator/sources/arch_aur';
 import SoftwareController from './controller/SoftwareController';
 import UserController from './controller/UserController';
 import AuthController from './controller/AuthController';
-import { convertFromAurToDatabaseFormat } from './helpers/DatabaseHelpers';
-import { isYoungerThan24Hours } from './helpers/TimeHelpers';
 import { auth } from './middleware/auth';
 import { getAurPackageInfo, getGeneralPackageInfo } from './curator/curator';
 
