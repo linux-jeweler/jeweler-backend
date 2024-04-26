@@ -118,4 +118,4 @@ Since merging only happened from Development to Staging and from Staging to Prod
 
 ### Issues faced
 
-A major issues for me was frequently committing. As stated before, the size of them always depended on the size of what I was currently working on and the frequency always depended on a milestone being reached. This is something that I have to improve on.
+A major issue for me was frequently committing. As stated before, the size of them always depended on the size of what I was currently working on and the frequency always depended on a milestone being reached. This is something that I have to improve on.
