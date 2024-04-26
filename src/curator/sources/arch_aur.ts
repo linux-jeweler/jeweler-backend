@@ -4,12 +4,8 @@ import fs from 'fs';
 import path from 'path';
 import SoftwareController from '../../controller/SoftwareController';
 import { checkRecentFileExists } from '../../helpers/FileHelpers';
-import { getTodaysDate, isYoungerThan24Hours } from '../../helpers/TimeHelpers';
-import {
-  SoftwareSourceData,
-  AurPackageInfo,
-  hasBeenModified,
-} from '../../helpers/DatabaseHelpers';
+import { getTodaysDate } from '../../helpers/TimeHelpers';
+import { AurPackageInfo, hasBeenModified } from '../../helpers/DatabaseHelpers';
 
 const today = getTodaysDate();
 const filePath = path.join(__dirname + '/aurDataSync_' + today + '.json');
