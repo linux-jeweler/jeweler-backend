@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+var customParseFormat = require('dayjs/plugin/customParseFormat');
+dayjs.extend(customParseFormat);
 
 // Takes in raw data from the AUR, removes unnecessary data and formats the data to match the database schema
 
@@ -56,17 +58,23 @@ export const hasBeenModified = (
 export function convertFromAurToDatabaseFormat(
   rawData: any
 ): SoftwareSourceData {
-  const lastModifiedUnix = rawData.LastModified;
-  const lastModified = dayjs(lastModifiedUnix * 1000).toDate();
+  const rawDate = rawData.LastModified;
+  var lastModified = 0 as any;
+  if (dayjs(rawDate, 'YYYY-MM-DDTHH:MM:SS.sssZ', true).isValid()) {
+    lastModified = rawDate;
+  } else {
+    lastModified = dayjs(rawDate * 1000).toDate();
+  }
 
   const formattedSoftwareData: SoftwareData = {
-    name: rawData.Name,
-    version: rawData.Version,
-    dependencies: rawData.Depends,
-    description: rawData.Description,
-    lastModified: lastModified,
-    license: rawData.License,
-    url: rawData.URL,
+    name: rawData.Name || rawData.name,
+    version: rawData.Version || rawData.version,
+    dependencies:
+      rawData.Depends || rawData.depends || rawData.dependencies || [],
+    description: rawData.Description || rawData.description || null,
+    lastModified: lastModified || rawData.lastModified || new Date(),
+    license: rawData.License || rawData.license || [],
+    url: rawData.URL || rawData.url || null,
   };
 
   const formattedSoftwareSourceData: SourceData = {
