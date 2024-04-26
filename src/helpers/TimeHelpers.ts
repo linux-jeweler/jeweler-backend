@@ -16,3 +16,14 @@ export function getTodaysDate() {
   const today = dayjs().format('YYYY-MM-DD');
   return today;
 }
+
+export function isOlderThanOneWeek(date: Date): boolean {
+  // Get the current date and time
+  const currentDate = dayjs();
+
+  // Calculate the date and time 7 days ago
+  const oneWeekAgo = currentDate.subtract(7, 'day');
+
+  // Check if the date is older than one week
+  return dayjs(date).isBefore(oneWeekAgo);
+}

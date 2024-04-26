@@ -11,7 +11,8 @@
     "db:format": "prisma format",
     "db:generate": "npm run db:format && prisma generate",
     "db:migrate": "npm run db:generate && prisma migrate dev --name migration",
-    "db:reset": "prisma migrate reset --force && npm run db:migrate"
+    "db:reset": "prisma migrate reset --force && npm run db:migrate",
+    "start:migrate:prod":"prisma migrate deploy && node dist/src/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -54,6 +55,7 @@
     "diff": "^4.0.2",
     "dotenv": "^16.4.5",
     "express": "^4.18.2",
+    "express-async-handler": "^1.2.0",
     "jsonwebtoken": "^9.0.2",
     "make-error": "^1.3.6",
     "prisma": "^5.12.1",
@@ -61,7 +63,9 @@
     "ua-parser-js": "^1.0.37",
     "undici-types": "^5.26.5",
     "v8-compile-cache-lib": "^3.0.1",
-    "yn": "^3.1.1"
+    "yn": "^3.1.1",
+    "zod": "^3.23.4",
+    "zod-express-middleware": "^1.4.0"
   },
   "keywords": [],
   "description": "",

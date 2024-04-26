@@ -67,11 +67,35 @@ class SoftwareController {
       },
 
       update: data.softwareData,
+      //{
+      // ...data.softwareData,
+      // softwareOnSources: {
+      //   update: {
+      //     where: {
+      //       SoftwareOnSourceId: {
+      //         softwareName: data.softwareData.name,
+      //         sourceName: data.softwareData.name,
+      //       },
+      //     },
+      //   },
+      // },
+      //}
     });
   }
 
   async delete(id: string) {
-    return prisma.software.delete({ where: { id } });
+    return prisma.software.delete({ where: { id: id } });
+  }
+
+  async deleteSource(name: string, source: string) {
+    return prisma.softwareOnSource.delete({
+      where: {
+        SoftwareOnSourceId: {
+          softwareName: name,
+          sourceName: source,
+        },
+      },
+    });
   }
 }
 

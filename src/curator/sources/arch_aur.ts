@@ -7,11 +7,14 @@ import { checkRecentFileExists } from '../../helpers/FileHelpers';
 import { getTodaysDate, isYoungerThan24Hours } from '../../helpers/TimeHelpers';
 import {
   SoftwareSourceData,
-  convertFromAurToDatabaseFormat,
+  AurPackageInfo,
+  hasBeenModified,
 } from '../../helpers/DatabaseHelpers';
 
 const today = getTodaysDate();
 const filePath = path.join(__dirname + '/aurDataSync_' + today + '.json');
+
+const softwareController = new SoftwareController();
 
 const SYNC_INTERVAL = process.env.SYNC_INTERVAL || '1440';
 export const ARCH_AUR = 'https://aur.archlinux.org';
@@ -28,7 +31,7 @@ export async function getAurInfo(name: string) {
       return null;
     }
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error('Error getting AUR Info: ', error);
   }
 }
 
@@ -47,90 +50,128 @@ export async function performAurSearch(query: string) {
     }
     return response.data?.results;
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error('Error performing search: ', error);
   }
 }
 
-export async function syncDatabaseWithAur() {
+export async function syncDatabaseWithAur2() {
   try {
-    const aurDatabaseSnapshot = await downloadAurDatabase();
-    //if aurDatabaseSnapshot is null, return
-    if (!aurDatabaseSnapshot) {
+    const updatedAurDatabase = await downloadFile();
+    const currentDatabase = await softwareController.getAll();
+    const toBeUpdated = [];
+    const toBeDeleted = [];
+
+    //if aurDatabaseSnapshot or currentDatabase is null, return
+    if (!updatedAurDatabase || !currentDatabase) {
       return;
     }
 
-    //get all entries from the database
-    const softwareController = new SoftwareController();
-    const databaseEntries = await softwareController.getAll();
-
     //iterate over all entries in the database
-    for (const databaseEntry of databaseEntries) {
-      //if database entry is older than 24 hours, update it
-      if (!isYoungerThan24Hours(databaseEntry.updatedAt)) {
-        const aurResult = await getAurInfo(databaseEntry.name);
-        if (aurResult) {
-          const databasePayload = convertFromAurToDatabaseFormat(aurResult);
+    for (const databaseEntry of currentDatabase) {
+      //if entry in the AUR database has been modified, add it to the list of entries to be updated
+      if (
+        !updatedAurDatabase.find((entry) =>
+          hasBeenModified(entry, databaseEntry)
+        )
+      ) {
+        toBeUpdated.push(databaseEntry);
+      }
 
-          //update database entry
-        }
+      //if database entry is no longer in the AUR database, add it to the list of entries to be deleted
+      if (
+        !updatedAurDatabase.find((entry) => entry.Name === databaseEntry.name)
+      ) {
+        toBeDeleted.push(databaseEntry);
+      }
+
+      //delete all entries to be deleted from the database
+      for (const entry of toBeDeleted) {
+        await softwareController.deleteSource(entry.name, 'aur');
       }
     }
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error('Error syncing with AUR database: ', error);
   }
 }
 
 //Takes in a single json object and inserts it into the database
 export async function insertIntoDatabase(objectToInsert: SoftwareSourceData) {
-  const softwareController = new SoftwareController();
-
-  //insert software into database
+  //insert or update software into database
   await softwareController.upsert(objectToInsert);
-
-  //insert software source into database
-  // await softwareOnSourceController.create({
-  //   ...objectToInsert.softwareSourceData,
-  //   source: { connect: { name: objectToInsert.softwareSourceData.source } },
-  //   software: { connect: { name: objectToInsert.softwareData.name } },
-  // });
 }
 
 //downloads a snapshot of the whole AUR database
 //writes it into a file and immediately reads it to prevent ENAMETOOLONG error
-export async function downloadAurDatabase() {
-  var aurDatabaseSnapshot = null;
+// export async function downloadAurDatabase() {
+//   var aurDatabaseSnapshot = null;
 
+//   try {
+//     //if no recent file exists, download the database snapshot
+//     if ((await checkRecentFileExists(filePath)) == false) {
+//       const response = await axios.get(
+//         ARCH_AUR + '/packages-meta-ext-v1.json.gz',
+//         { responseType: 'blob' }
+//       );
+
+//       //write response to file and change file ending to json
+//       fs.writeFile(filePath, response.data, (error) => {
+//         if (error) {
+//           console.error('Error writing file: ' + error.code);
+//           return null;
+//         }
+//       });
+//     } else {
+//       console.log('File already exists');
+//       return null;
+//     }
+
+//     //read written file
+//     fs.readFile(filePath, 'utf-8', (error, data) => {
+//       const snapshot = JSON.parse(data);
+
+//       if (error) {
+//         console.error('Error writing file: ' + error.code);
+//         return null;
+//       }
+
+//       return snapshot;
+//     });
+//   } catch (error) {
+//     console.error('Error downloading AUR database: ', error);
+//   }
+// }
+
+async function downloadFile(): Promise<AurPackageInfo[] | undefined> {
   try {
-    //fetch database snapshot if not already there
     if (await checkRecentFileExists(filePath)) {
-    } else {
-      const response = await axios.get(
-        ARCH_AUR + '/packages-meta-ext-v1.json.gz',
-        { responseType: 'blob' }
-      );
-
-      //write response to file and change file ending to json
-      fs.writeFile(filePath, response.data, (error) => {
-        if (error) {
-          console.error('Error writing file: ' + error.code);
-          return null;
-        }
-      });
-
-      //read written file
-      fs.readFile(filePath, 'utf8', (error, data) => {
-        if (error) {
-          console.error('Error reading file: ' + error.code);
-          return null;
-        }
-
-        aurDatabaseSnapshot = JSON.parse(data);
-      });
+      const content = fs.readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(content);
+      console.log('File already exists');
+      return data;
     }
 
-    return aurDatabaseSnapshot;
+    const response = await axios({
+      method: 'GET',
+      url: ARCH_AUR + '/packages-meta-ext-v1.json.gz',
+      responseType: 'stream',
+    });
+
+    // Create a write stream to save the file
+    const writer = fs.createWriteStream(filePath);
+
+    // Pipe the data to the file
+    response.data.pipe(writer);
+
+    return new Promise((resolve, reject) => {
+      writer.on('finish', () => {
+        const content = fs.readFileSync(filePath, 'utf-8');
+        const data = JSON.parse(content);
+        resolve(data);
+      });
+      writer.on('error', reject);
+    });
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error('Error downloading the file:', error);
   }
 }
 
