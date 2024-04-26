@@ -1,6 +1,6 @@
-import { PrismaClient, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../data-source';
+import { Prisma } from '@prisma/client';
+import { SoftwareSourceData } from '../helpers/DatabaseHelpers';
 
 class SoftwareController {
   async create(data: Prisma.SoftwareCreateInput) {
@@ -11,20 +11,91 @@ class SoftwareController {
     return prisma.software.findUnique({ where: { id } });
   }
 
+  async getManyByName(name: string) {
+    const result =
+      await prisma.$queryRaw`SELECT * FROM "Software" WHERE name ILIKE '%' || ${name} || '%' OR name % ${name};`;
+
+    return result;
+  }
+
   async getByName(name: string) {
-    return prisma.software.findFirst({ where: { name } });
+    return prisma.software.findFirst({
+      where: { name },
+      include: {
+        softwareOnSources: {
+          select: {
+            instructions: true,
+            installCommand: true,
+            downloadLink: true,
+            source: true,
+          },
+        },
+      },
+    });
   }
 
   async getAll() {
     return prisma.software.findMany();
   }
 
-  async update(id: string, data: Prisma.SoftwareUpdateInput) {
-    return prisma.software.update({ where: { id }, data });
+  async getAllWithSources() {
+    return prisma.software.findMany({
+      include: {
+        softwareOnSources: {
+          select: {
+            installCommand: true,
+            downloadLink: true,
+            instructions: true,
+            source: true,
+          },
+        },
+      },
+    });
+  }
+
+  async upsert(data: SoftwareSourceData) {
+    return prisma.software.upsert({
+      where: { name: data.softwareData.name },
+      create: {
+        ...data.softwareData,
+        softwareOnSources: {
+          create: {
+            ...data.softwareSourceData,
+            source: { connect: { name: data.softwareSourceData.source } },
+          },
+        },
+      },
+
+      update: data.softwareData,
+      //{
+      // ...data.softwareData,
+      // softwareOnSources: {
+      //   update: {
+      //     where: {
+      //       SoftwareOnSourceId: {
+      //         softwareName: data.softwareData.name,
+      //         sourceName: data.softwareData.name,
+      //       },
+      //     },
+      //   },
+      // },
+      //}
+    });
   }
 
   async delete(id: string) {
-    return prisma.software.delete({ where: { id } });
+    return prisma.software.delete({ where: { id: id } });
+  }
+
+  async deleteSource(name: string, source: string) {
+    return prisma.softwareOnSource.delete({
+      where: {
+        SoftwareOnSourceId: {
+          softwareName: name,
+          sourceName: source,
+        },
+      },
+    });
   }
 }
 

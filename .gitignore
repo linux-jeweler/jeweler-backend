@@ -1,5 +1,9 @@
 node_modules
 dist
+coverage
 .env
 .DS_Store
 .prettierrc
+.vscode
+
+aurDataSync_*.json

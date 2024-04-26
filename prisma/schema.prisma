@@ -1,63 +1,89 @@
-generator client {
-  provider = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x", "darwin-arm64"]
-}
+  generator client {
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x", "darwin-arm64"]
+    previewFeatures = ["fullTextSearch","postgresqlExtensions"]
+  }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+  datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+    extensions = [pg_trgm]
+  }
 
-model LinuxDistro {
-  id            String              @id @default(uuid())
-  name          String
-  version       String
+  model LinuxDistro {
+    id                String             @id @default(uuid())
+    name              String             @unique
+    version           String
 
-  packageSources PackageSource[]
-  softwareOnSources SoftwareOnSource[]
-}
+    packageSources    PackageSource[]    @relation("LinuxDistroToPackageSource")
+    users             User[]             @relation("LinuxDistroToUser")
 
-model PackageSource {
-  id            String              @id @default(uuid())
-  name          String
-  image         String?
-  info          String?
-  description   String?
-  url           String?
-  trustedStatus Boolean
+    @@unique([name, version])
+  }
 
-  distros           LinuxDistro[]
-  software          Software[]
-  softwareOnSources SoftwareOnSource[]
-}
+  model PackageSource {
+    id                String             @id @default(uuid())
+    name              String             @unique
+    image             String?
+    info              String?
+    description       String?
+    url               String?
+    trustedStatus     Boolean
 
-model Software {
-  id            String              @id @default(uuid())
-  name          String
-  version       String
-  dependencies  String[]
-  description   String?
-  lastModified  DateTime            
-  lastRequested DateTime            @default(now()) @db.Timestamp(0)            
-  license       String[]
-  url           String?
+    createdAt         DateTime           @default(now())
+    updatedAt         DateTime           @updatedAt
 
-  packageSources PackageSource[]
-  softwareOnSources SoftwareOnSource[]
-}
+    softwareOnSources SoftwareOnSource[]
+    distros           LinuxDistro[]      @relation("LinuxDistroToPackageSource")
+    software          Software[]         @relation("PackageSourceToSoftware")
+  }
 
-model SoftwareOnSource {
-  software      Software         @relation(fields: [softwareId], references: [id])
-  softwareId    String
-  source        PackageSource    @relation(fields: [sourceId], references: [id])
-  sourceId      String
-  distro        LinuxDistro      @relation(fields: [distroId], references: [id])
-  distroId      String
+  model Software {
+    id                String             @id @default(uuid())
+    name              String             @unique
+    version           String
+    description       String?
+    dependencies      String[]
+    lastModified      DateTime
+    url               String?
+    license           String[]
+    
 
-  installCommand String?
-  instructions  String?
-  downloadLink  String?
+    createdAt         DateTime           @default(now())
+    updatedAt         DateTime           @updatedAt
 
-  @@id([softwareId, sourceId, distroId])
-}
+    softwareOnSources SoftwareOnSource[]
+    packageSources    PackageSource[]    @relation("PackageSourceToSoftware")
+    users             User[]             @relation("SoftwareToUser")
+
+    @@unique([name, version])
+  }
+
+  model SoftwareOnSource {
+    softwareName     String
+    sourceName       String
+    installCommand String?
+    instructions   String?
+    downloadLink   String?
+
+    software       Software      @relation(fields: [softwareName], references: [name])
+    source         PackageSource @relation(fields: [sourceName], references: [name])
+
+    createdAt      DateTime      @default(now())
+    updatedAt      DateTime      @updatedAt
+
+    @@id([softwareName, sourceName], name: "SoftwareOnSourceId")
+  }
+
+  model User {
+    id            String        @id @default(uuid())
+    email         String        @unique
+    password      String
+
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
+
+    usedDistros   LinuxDistro[] @relation("LinuxDistroToUser")
+    likedPackages Software[]    @relation("SoftwareToUser")
+  }
 
