@@ -10,3 +10,5 @@ function createServer() {
 }
 
 export default createServer;
+
+module.exports = createServer;

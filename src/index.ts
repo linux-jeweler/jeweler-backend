@@ -53,6 +53,7 @@ app.get(
 app.get(
   '/search/',
   asyncHandler(async (_req, res) => {
+    res.status(400);
     res.json('No search query provided');
   })
 );

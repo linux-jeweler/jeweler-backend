@@ -1,8 +1,18 @@
-import supertest from 'supertest';
-import app from '../../src/server';
+const request = require('supertest');
+const createServer = require('../../src/server');
 
-// describe('health check', () => {
-//   it('should return 200', async () => {
-//     return supertest(app).get('/').expect(200);
-//   });
-// });
+const app = createServer();
+
+describe('health check', () => {
+  it('should return 200', async () => {
+    const response = await request(app).get('/');
+    console.log(response.body);
+    expect(response).toBe(200);
+  });
+});
+
+describe('/search/', () => {
+  it('should return 400', async () => {
+    return request(app).get('/search/').expect(400);
+  });
+});

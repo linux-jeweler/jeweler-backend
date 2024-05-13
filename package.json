@@ -6,6 +6,7 @@
     "test": "jest __tests__",
     "test:unit": "jest __tests__/unit",
     "test:integration": "jest __tests__/integration",
+    "test:detect": "jest --detectOpenHandles",
     "start": "ts-node src/index.ts",
     "dev": "ts-node-dev src/index.ts",
     "build": "rm -rf ./dist/* && npm run lint && tsc",
