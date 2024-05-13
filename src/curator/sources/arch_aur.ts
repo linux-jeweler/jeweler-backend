@@ -44,15 +44,15 @@ export async function performAurSearch(query: string) {
     } else {
       return null;
     }
-    return response.data?.results;
+    return results;
   } catch (error) {
     console.error('Error performing search: ', error);
   }
 }
 
-export async function syncDatabaseWithAur2() {
+export async function syncDatabaseWithAur() {
   try {
-    const updatedAurDatabase = await downloadFile();
+    const updatedAurDatabase = await downloadAurSnapshot();
     const currentDatabase = await softwareController.getAll();
     const toBeUpdated = [];
     const toBeDeleted = [];
@@ -90,48 +90,7 @@ export async function syncDatabaseWithAur2() {
   }
 }
 
-//downloads a snapshot of the whole AUR database
-//writes it into a file and immediately reads it to prevent ENAMETOOLONG error
-// export async function downloadAurDatabase() {
-//   var aurDatabaseSnapshot = null;
-
-//   try {
-//     //if no recent file exists, download the database snapshot
-//     if ((await checkRecentFileExists(filePath)) == false) {
-//       const response = await axios.get(
-//         ARCH_AUR + '/packages-meta-ext-v1.json.gz',
-//         { responseType: 'blob' }
-//       );
-
-//       //write response to file and change file ending to json
-//       fs.writeFile(filePath, response.data, (error) => {
-//         if (error) {
-//           console.error('Error writing file: ' + error.code);
-//           return null;
-//         }
-//       });
-//     } else {
-//       console.log('File already exists');
-//       return null;
-//     }
-
-//     //read written file
-//     fs.readFile(filePath, 'utf-8', (error, data) => {
-//       const snapshot = JSON.parse(data);
-
-//       if (error) {
-//         console.error('Error writing file: ' + error.code);
-//         return null;
-//       }
-
-//       return snapshot;
-//     });
-//   } catch (error) {
-//     console.error('Error downloading AUR database: ', error);
-//   }
-// }
-
-async function downloadFile(): Promise<AurPackageInfo[] | undefined> {
+async function downloadAurSnapshot(): Promise<AurPackageInfo[] | undefined> {
   try {
     if (await checkRecentFileExists(filePath)) {
       const content = fs.readFileSync(filePath, 'utf-8');

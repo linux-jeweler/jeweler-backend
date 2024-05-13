@@ -3,7 +3,7 @@ import './data-source';
 import expressAsyncHandler from 'express-async-handler';
 import { validateRequest } from 'zod-express-middleware';
 import { zodSchema } from './controller/AuthController';
-import { syncDatabaseWithAur2 } from './curator/sources/arch_aur';
+import { syncDatabaseWithAur } from './curator/sources/arch_aur';
 import SoftwareController from './controller/SoftwareController';
 import UserController from './controller/UserController';
 import AuthController from './controller/AuthController';
@@ -97,7 +97,7 @@ app.get(
 app.post(
   '/aur/sync',
   asyncHandler(async (_req, res) => {
-    await syncDatabaseWithAur2();
+    await syncDatabaseWithAur();
     res.json('Database synced with AUR');
   })
 );
