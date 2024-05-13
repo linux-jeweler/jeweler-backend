@@ -2,10 +2,10 @@ import UserController from '../../../src/controller/UserController';
 import { prisma } from '../../../src/data-source';
 
 describe('UserController', () => {
-  let uc: UserController;
+  let userController: UserController;
 
   beforeEach(() => {
-    uc = new UserController();
+    userController = new UserController();
   });
 
   afterEach(async () => {
@@ -15,7 +15,10 @@ describe('UserController', () => {
 
   describe('create', () => {
     it('creates a user', async () => {
-      const user = await uc.create({ email: 'test@test.de', password: 'test' });
+      const user = await userController.create({
+        email: 'test@test.de',
+        password: 'test',
+      });
 
       expect(user.email).toBe('test@test.de');
       expect(user.password).toBe('test');
@@ -35,7 +38,7 @@ describe('UserController', () => {
       const createdUser = await prisma.user.create({
         data: { email: 'test@test.de', password: 'test' },
       });
-      const user = await uc.getById(createdUser.id);
+      const user = await userController.getById(createdUser.id);
 
       expect(user).toEqual(createdUser);
     });
@@ -46,7 +49,7 @@ describe('UserController', () => {
       const createdUser = await prisma.user.create({
         data: { email: 'test@test.de', password: 'test' },
       });
-      const user = await uc.getByEmail(createdUser.email);
+      const user = await userController.getByEmail(createdUser.email);
 
       expect(user).toEqual(createdUser);
     });
@@ -57,7 +60,7 @@ describe('UserController', () => {
       const createdUser = await prisma.user.create({
         data: { email: 'test@test.de', password: 'test' },
       });
-      const updatedUser = await uc.update(createdUser.id, {
+      const updatedUser = await userController.update(createdUser.id, {
         email: 'updated@test.de',
       });
 
@@ -73,7 +76,7 @@ describe('UserController', () => {
       const createdUser = await prisma.user.create({
         data: { email: 'test@test.de', password: 'test' },
       });
-      await uc.delete(createdUser.id);
+      await userController.delete(createdUser.id);
 
       const deletedUser = await prisma.user.findUnique({
         where: { id: createdUser.id },

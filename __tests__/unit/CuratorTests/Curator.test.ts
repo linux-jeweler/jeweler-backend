@@ -1,6 +1,14 @@
-import { insertIntoDatabase } from '../../../src/curator/curator';
+import {
+  insertIntoDatabase,
+  getAurPackageInfo,
+  getGeneralPackageInfo,
+} from '../../../src/curator/curator';
 import { SoftwareSourceData } from '../../../src/helpers/DatabaseHelpers';
 import { prisma } from '../../../src/data-source';
+
+import { requestSinglePackageFromAur } from '../../../src/curator/sources/arch_aur';
+import axios from 'axios';
+jest.mock('axios');
 
 describe('insertIntoDatabase', () => {
   it('should insert a package into the database', async () => {
