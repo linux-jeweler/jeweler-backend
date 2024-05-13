@@ -2,7 +2,7 @@ import {
   isYoungerThan24Hours,
   getTodaysDate,
   isOlderThanOneWeek,
-} from '../../src/helpers/TimeHelpers';
+} from '../../../src/helpers/TimeHelpers';
 
 describe('isYoungerThan24Hours', () => {
   describe('when the date is older than 24 hours', () => {

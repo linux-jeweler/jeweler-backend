@@ -5,7 +5,7 @@ import {
   AurPackageInfo,
   SoftwareData,
   SoftwareSourceData,
-} from '../../src/helpers/DatabaseHelpers';
+} from '../../../src/helpers/DatabaseHelpers';
 
 describe('hasBeenModified', () => {
   describe('when the AUR entry has been modified', () => {

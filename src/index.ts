@@ -1,6 +1,5 @@
-import express from 'express';
+import createServer from './server';
 import './data-source';
-import cors from 'cors';
 import expressAsyncHandler from 'express-async-handler';
 import { validateRequest } from 'zod-express-middleware';
 import { zodSchema } from './controller/AuthController';
@@ -12,11 +11,8 @@ import { auth } from './middleware/auth';
 import { getAurPackageInfo, getGeneralPackageInfo } from './curator/curator';
 
 const port = process.env.PORT || 3001;
-const app = express();
+const app = createServer();
 const asyncHandler = expressAsyncHandler;
-
-app.use(express.json());
-app.use(cors());
 
 const softwareController = new SoftwareController();
 const userController = new UserController();

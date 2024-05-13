@@ -1,4 +1,4 @@
-import { validateUserAgent } from '../../src/helpers/UserAgentHelper';
+import { validateUserAgent } from '../../../src/helpers/UserAgentHelper';
 
 describe('validateUserAgent', () => {
   describe('when the user agent is valid', () => {
