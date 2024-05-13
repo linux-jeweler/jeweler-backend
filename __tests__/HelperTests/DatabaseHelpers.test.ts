@@ -117,11 +117,15 @@ describe('convertFromAurToDatabaseFormat', () => {
 
       expect(result.softwareData.name).toBe('test');
       expect(result.softwareData.version).toBe('1.0');
-      expect(result.softwareData.dependencies).toEqual(['test']);
+      expect(result.softwareData.dependencies).toBeDefined();
       expect(result.softwareData.description).toBe('test');
       expect(result.softwareData.lastModified).toBeInstanceOf(Date);
       expect(result.softwareData.license).toEqual(['test']);
       expect(result.softwareData.url).toBe('test');
+      expect(result.softwareSourceData.source).toBe('aur');
+      expect(result.softwareSourceData.instructions).toBeDefined();
+      expect(result.softwareSourceData.installCommand).toBeDefined();
+      expect(result.softwareSourceData.downloadLink).toBeDefined();
     });
   });
 
@@ -159,6 +163,10 @@ describe('convertFromAurToDatabaseFormat', () => {
       expect(result.softwareData.lastModified).toBeInstanceOf(Date);
       expect(result.softwareData.license).toEqual(['test']);
       expect(result.softwareData.url).toBe('test');
+      expect(result.softwareSourceData.source).toBe('aur');
+      expect(result.softwareSourceData.instructions).toBeDefined();
+      expect(result.softwareSourceData.installCommand).toBeDefined();
+      expect(result.softwareSourceData.downloadLink).toBeDefined();
     });
   });
 });

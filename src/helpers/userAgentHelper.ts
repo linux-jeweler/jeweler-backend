@@ -19,11 +19,11 @@ export const validateUserAgent = async (req: any) => {
     return null;
   }
 
-  //   const distro = await distroController.getByName(osName);
+  // const distro = await distroController.getByName(osName);
 
-  //   if (distro) {
-  //     return distro.name;
-  //   } else {
-  //     return null;
-  //   }
+  // if (distro) {
+  //   return distro.name;
+  // } else {
+  //   return null;
+  // }
 };
