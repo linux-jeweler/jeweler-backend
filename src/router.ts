@@ -8,9 +8,10 @@ import UserController from './controller/UserController';
 import AuthController from './controller/AuthController';
 import { auth } from './middleware/auth';
 import { getAurPackageInfo, getGeneralPackageInfo } from './curator/curator';
+import { prisma } from './data-source';
 
 const softwareController = new SoftwareController();
-const userController = new UserController();
+const userController = new UserController(prisma);
 const authController = new AuthController();
 const asyncHandler = expressAsyncHandler;
 

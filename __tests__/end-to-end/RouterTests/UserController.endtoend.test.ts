@@ -37,4 +37,36 @@ describe('POST /register', () => {
       });
 
     });
+
+    describe('when the request is invalid', () => {
+      it('should return 400 and an error message', async () => {
+        const req = { body: 
+          {
+          email: '',
+          }
+        };
+
+        const response = await request(app).post('/register').send(req).expect(400);
+
+      });
+
+    });
+
+    describe('when the user already exists', () => {
+      it('should return 400 and an error message', async () => {
+        const req = { body: 
+          {
+          email: 'test@test.te',
+          password: 'testtest123'
+          }
+        };
+
+        const createdUser = await request(app).post('/register').send(req).expect(201);
+        const response = await request(app).post('/register').send(req).expect(400);
+
+        expect(response.body.error).toBe('User already exists');
+        
+      });
+    });
+
 });

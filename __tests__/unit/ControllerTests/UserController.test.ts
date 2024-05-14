@@ -5,7 +5,7 @@ describe('UserController', () => {
   let userController: UserController;
 
   beforeEach(() => {
-    userController = new UserController();
+    userController = new UserController(prisma);
   });
 
   afterEach(async () => {

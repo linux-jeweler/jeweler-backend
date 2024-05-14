@@ -1,25 +1,31 @@
-import { Prisma } from '@prisma/client';
-import { prisma } from '../data-source';
+import { Prisma, PrismaClient } from '@prisma/client';
+//import { prisma } from '../data-source';
 
 class UserController {
+  prisma: PrismaClient;
+
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
+  }
+
   async create(data: Prisma.UserCreateInput) {
-    return prisma.user.create({ data });
+    return this.prisma.user.create({ data });
   }
 
   async getById(id: string) {
-    return prisma.user.findUnique({ where: { id } });
+    return this.prisma.user.findUnique({ where: { id } });
   }
 
-  getByEmail(email: string) {
-    return prisma.user.findFirst({ where: { email } });
+  async getByEmail(email: string) {
+    return this.prisma.user.findFirst({ where: { email } });
   }
 
   async update(id: string, data: Prisma.UserUpdateInput) {
-    return prisma.user.update({ where: { id }, data });
+    return this.prisma.user.update({ where: { id }, data });
   }
 
   async delete(id: string) {
-    return prisma.user.delete({ where: { id } });
+    return this.prisma.user.delete({ where: { id } });
   }
 }
 
