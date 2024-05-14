@@ -2,7 +2,7 @@ import { Secret, JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import AuthController from '../controller/AuthController';
 
-export const SECRET_KEY: Secret = process.env.JWT_SECRET ?? '';
+export const SECRET_KEY: Secret = process.env.JWT_SECRET ?? 'secret';
 if (!SECRET_KEY) {
   throw new Error('JWT_SECRET not set in .env');
 }
